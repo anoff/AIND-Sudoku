@@ -55,7 +55,15 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
-    pass
+    rows = 'ABCDEFGHI'
+    cols = '123456789'
+    width = 1+max(len(values[s]) for s in values.keys())
+    line = '+'.join(['-'*(width*3)]*3)
+    for r in rows:
+        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
+                      for c in cols))
+        if r in 'CF': print(line)
+    return
 
 def unitlist():
     """
@@ -67,7 +75,7 @@ def unitlist():
     column_units = [cross(rows, c) for c in cols]
     square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')]
     # add the diagonals as units
-    diagonals = [[rows[i]+cols[i] for i in range(8)], [rows[i]+cols[8-i] for i in range(8)]]
+    diagonals = [[rows[i]+cols[i] for i in range(9)], [rows[i]+cols[8-i] for i in range(9)]]
     return row_units + column_units + square_units + diagonals
 
 def peers():
