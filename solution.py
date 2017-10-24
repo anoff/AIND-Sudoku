@@ -66,7 +66,9 @@ def unitlist():
     row_units = [cross(r, cols) for r in rows]
     column_units = [cross(rows, c) for c in cols]
     square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')]
-    return row_units + column_units + square_units
+    # add the diagonals as units
+    diagonals = [[rows[i]+cols[i] for i in range(8)], [rows[i]+cols[8-i] for i in range(8)]]
+    return row_units + column_units + square_units + diagonals
 
 def peers():
     """
@@ -87,7 +89,7 @@ def narrow_down_possibilities(values):
     for box in [b for b in values.keys() if len(values[b]) == 1]:
         digit = values[box]
         for peer in peers()[box]:
-            values = assign_value(values, box, values[peer].replace(digit, ""))
+            values = assign_value(values, peer, values[peer].replace(digit, ""))
     return values
 
 def assign_explicits(values):
@@ -108,17 +110,17 @@ def reduce_puzzle(values):
     if unsolvable (box without values) return False
     """
     def count_solved_boxes(values):
-        return len([b for b in values.keys() if len(values[b] == 1)])
+        return len([b for b in values.keys() if len(values[b]) == 1])
     improved = True
     while improved:
         improved = False
         previous = values
-        values = assign_explicits(values)
         values = narrow_down_possibilities(values)
+        values = assign_explicits(values)
         if len([b for b in values.keys() if len(values[b]) == 0]) > 0:
-            return False
-        elif count_solved_boxes(previous) != count_solved_boxes(values):
-            improved = True
+            return False # mark as unsolvable
+        elif count_solved_boxes(previous) < count_solved_boxes(values):
+            improved = True # keep looping while making progress
     return values
 
 def search(values):
@@ -128,9 +130,9 @@ def search(values):
     return values if solved
     """
     values = reduce_puzzle(values)
-    if values == False:
+    if not values:
         return False
-    if len([b for b in values.keys() if len(values[b] > 1)]) == 0:
+    if not [b for b in values.keys() if len(values[b]) > 1]: # no boxes with multiple digits
         return values
     # find an unsolved (>1) box with the least amount of possible digits
     _, box = min([(len(values[b]), b) for b in values.keys() if len(values[b]) > 1])
@@ -150,6 +152,8 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    values = grid_values(grid)
+    return search(values)
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
