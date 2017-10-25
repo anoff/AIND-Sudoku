@@ -3,11 +3,11 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: Identify naked twins by checking for identical two digits in two peers. Propagate the constraint that these digits may not appear in any peers that the two twins have in common (inner join each peers)
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: Include the diagonals into the units list
 
 ### Install
 
@@ -42,3 +42,45 @@ To submit your code to the project assistant, run `udacity submit` from within t
 
 This process will create a zipfile in your top-level directory named sudoku-<id>.zip.  This is the file that you should submit to the Udacity reviews system.
 
+## Problemo 🔥🔥
+
+Unit Test and PA fails because my solution is incorrect. PA says
+>Not all of the tests passed.  Let me see what I can do to help.
+
+>Your submission failed a test that sees whether the solve method
+produces a valid solution.  One of the original values was changed.
+Try your code on the following example:
+
+>9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9.....
+...........
+
+However running a solve on the above code shows that no original values of the input were modified in the solution.
+
+```
+▶ python solution.py
+input:
+    9   .   1|.   .   . |.   8   .
+    8   .   5|.   7   . |.   4   .
+    2   .   4|.   .   . |.   6   .
+   ----------+----------+---------
+    .   .   7|.   .   . |.   .   .
+    .   .   .|.   .   . |8   3   .
+    5   .   .|.   .   . |.   .   .
+   ----------+----------+---------
+    3   .   .|6   .   . |.   .   .
+    .   9   .|.   .   . |.   .   .
+    .   .   .|.   .   . |.   .   .
+
+solution:
+9 6 1 |4 5 5 |7 8 3
+8 3 5 |9 7 6 |2 4 1
+2 7 4 |8 1 3 |5 6 9
+------+------+------
+6 4 7 |2 3 8 |9 1 5
+1 2 9 |5 6 4 |8 3 7
+5 8 3 |1 9 7 |4 2 6
+------+------+------
+3 5 2 |6 8 9 |1 7 4
+4 9 6 |7 2 1 |3 5 8
+7 1 8 |3 4 2 |6 9 5
+```

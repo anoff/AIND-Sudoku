@@ -178,6 +178,10 @@ def solve(grid):
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = "9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................"
+    print("input:")
+    display(grid_values(diag_sudoku_grid))
+    print("\nsolution:")
     display(solve(diag_sudoku_grid))
 
     try:

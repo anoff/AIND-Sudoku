@@ -92,7 +92,9 @@ class TestDiagonalSudoku(unittest.TestCase):
                           'D1': '5'}
 
     def test_solve(self):
-        print("expected:")
+        print("input:")
+        solution.display(solution.grid_values(self.diagonal_grid))
+        print("\nexpected:")
         solved = solution.solve(self.diagonal_grid)
         solution.display(self.solved_diag_sudoku)
         print("\nsolution:")
