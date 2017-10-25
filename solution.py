@@ -25,7 +25,19 @@ def naked_twins(values):
     """
 
     # Find all instances of naked twins
-    # Eliminate the naked twins as possibilities for their peers
+    peers = get_peers()
+    for box in [b for b in values.keys() if len(values[b]) == 2]: # all boxes with 2 digits
+        twins = [b for b in peers[box] if values[b] == values[box]]
+        if twins: # twin exists
+            twin = twins[0]
+            peers_1 = peers[box]
+            peers_2 = peers[twin]
+            joined_peers = [b for b in peers_1 if b in peers_2 if len(values[b]) > 1]
+            for peer in joined_peers:
+#                print(values[box], values[peer], values[peer].replace(values[box][0], ""), values[peer].replace(values[box][0], "").replace(values[box][1], ""))
+                values = assign_value(values, peer, values[peer]
+                                      .replace(values[box][0], "").replace(values[box][1], ""))
+    return values
 
 def cross(A, B):
     "Cross product of elements in A and elements in B."
@@ -65,7 +77,7 @@ def display(values):
         if r in 'CF': print(line)
     return
 
-def unitlist():
+def get_unitlist():
     """
     return list of units that belong together
     """
@@ -78,7 +90,7 @@ def unitlist():
     diagonals = [[rows[i]+cols[i] for i in range(9)], [rows[i]+cols[8-i] for i in range(9)]]
     return row_units + column_units + square_units + diagonals
 
-def peers():
+def get_peers():
     """
     return peers dictionary
     taken from lesson 🙄
@@ -86,7 +98,7 @@ def peers():
     rows = 'ABCDEFGHI'
     cols = '123456789'
     boxes = cross(rows, cols)
-    units = dict((s, [u for u in unitlist() if s in u]) for s in boxes)
+    units = dict((s, [u for u in get_unitlist() if s in u]) for s in boxes)
     return dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)
 
 def narrow_down_possibilities(values):
@@ -96,7 +108,7 @@ def narrow_down_possibilities(values):
     """
     for box in [b for b in values.keys() if len(values[b]) == 1]:
         digit = values[box]
-        for peer in peers()[box]:
+        for peer in get_peers()[box]:
             values = assign_value(values, peer, values[peer].replace(digit, ""))
     return values
 
@@ -104,7 +116,7 @@ def assign_explicits(values):
     """
     if there is only one possible position for a value in a unit -> assign it
     """
-    for unit in unitlist():
+    for unit in get_unitlist():
         for number in "123456789":
             box_with_number = [box for box in unit if number in values[box]]
             if len(box_with_number) == 1:
@@ -124,6 +136,7 @@ def reduce_puzzle(values):
         improved = False
         previous = values
         values = narrow_down_possibilities(values)
+        values = naked_twins(values)
         values = assign_explicits(values)
         if len([b for b in values.keys() if len(values[b]) == 0]) > 0:
             return False # mark as unsolvable
