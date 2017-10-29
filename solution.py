@@ -1,5 +1,21 @@
 assignments = []
 
+rows = 'ABCDEFGHI'
+cols = '123456789'
+
+def cross(a, b):
+    return [s+t for s in a for t in b]
+
+boxes = cross(rows, cols)
+
+row_units = [cross(r, cols) for r in rows]
+column_units = [cross(rows, c) for c in cols]
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+diagonals = [[rows[i]+cols[i] for i in range(9)], [rows[i]+cols[8-i] for i in range(9)]]
+unitlist = row_units + column_units + square_units + diagonals
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -25,7 +41,6 @@ def naked_twins(values):
     """
 
     # Find all instances of naked twins
-    peers = get_peers()
     for box in [b for b in values.keys() if len(values[b]) == 2]: # all boxes with 2 digits
         twins = [b for b in peers[box] if values[b] == values[box]]
         if twins: # twin exists
@@ -35,13 +50,10 @@ def naked_twins(values):
             joined_peers = [b for b in peers_1 if b in peers_2 if len(values[b]) > 1]
             for peer in joined_peers:
 #                print(values[box], values[peer], values[peer].replace(values[box][0], ""), values[peer].replace(values[box][0], "").replace(values[box][1], ""))
-                values = assign_value(values, peer, values[peer]
-                                      .replace(values[box][0], "").replace(values[box][1], ""))
+                if len(values[peer]) > 2:
+                    values = assign_value(values, peer, values[peer]
+                                          .replace(values[box][0], "").replace(values[box][1], ""))
     return values
-
-def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    return [a+b for a in A for b in B]
 
 def grid_values(grid):
     """
@@ -54,7 +66,9 @@ def grid_values(grid):
             Values: The value in each box, e.g., '8'. If the box has no value,
                 then the value will be '123456789'.
     """
-    boxes = cross("ABCDFEGHI", "123456789")
+    if (type(grid) == type({})):
+        return grid
+    boxes = cross("ABCDEFGHI", "123456789")
     d = dict(zip(boxes, grid))
     for k, v in d.items():
         if v == ".":
@@ -77,30 +91,6 @@ def display(values):
         if r in 'CF': print(line)
     return
 
-def get_unitlist():
-    """
-    return list of units that belong together
-    """
-    rows = 'ABCDEFGHI'
-    cols = '123456789'
-    row_units = [cross(r, cols) for r in rows]
-    column_units = [cross(rows, c) for c in cols]
-    square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in ('123', '456', '789')]
-    # add the diagonals as units
-    diagonals = [[rows[i]+cols[i] for i in range(9)], [rows[i]+cols[8-i] for i in range(9)]]
-    return row_units + column_units + square_units + diagonals
-
-def get_peers():
-    """
-    return peers dictionary
-    taken from lesson 🙄
-    """
-    rows = 'ABCDEFGHI'
-    cols = '123456789'
-    boxes = cross(rows, cols)
-    units = dict((s, [u for u in get_unitlist() if s in u]) for s in boxes)
-    return dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)
-
 def narrow_down_possibilities(values):
     """
     find boxes with only one value
@@ -108,7 +98,7 @@ def narrow_down_possibilities(values):
     """
     for box in [b for b in values.keys() if len(values[b]) == 1]:
         digit = values[box]
-        for peer in get_peers()[box]:
+        for peer in peers[box]:
             values = assign_value(values, peer, values[peer].replace(digit, ""))
     return values
 
@@ -116,7 +106,7 @@ def assign_explicits(values):
     """
     if there is only one possible position for a value in a unit -> assign it
     """
-    for unit in get_unitlist():
+    for unit in unitlist:
         for number in "123456789":
             box_with_number = [box for box in unit if number in values[box]]
             if len(box_with_number) == 1:
@@ -129,19 +119,17 @@ def reduce_puzzle(values):
     if completed or stalled return the list of values
     if unsolvable (box without values) return False
     """
-    def count_solved_boxes(values):
-        return len([b for b in values.keys() if len(values[b]) == 1])
-    improved = True
-    while improved:
-        improved = False
-        previous = values
+    solved_values = [box for box in values.keys() if len(values[box]) == 1]
+    stalled = False
+    while not stalled:
+        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
         values = narrow_down_possibilities(values)
         values = naked_twins(values)
         values = assign_explicits(values)
-        if len([b for b in values.keys() if len(values[b]) == 0]) > 0:
-            return False # mark as unsolvable
-        elif count_solved_boxes(previous) < count_solved_boxes(values):
-            improved = True # keep looping while making progress
+        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+        stalled = solved_values_before == solved_values_after
+        if len([box for box in values.keys() if len(values[box]) == 0]):
+            return False
     return values
 
 def search(values):
@@ -177,12 +165,30 @@ def solve(grid):
     return search(values)
 
 if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    diag_sudoku_grid = "9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................"
+#    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+#    diag_sudoku_grid = "9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................"
+    sudoku = {"I7": "1", "D8": "2", "B2": "1234568", "E9": "3", "C2": "1234568",
+        "C3": "1234569", "H3": "1234569", "B6": "236789", "D6": "5", "I9":
+        "9", "E8": "1", "A4": "34568", "A9": "2458", "F4": "9", "H5":
+        "23456789", "E3": "56", "A3": "7", "A1": "2345689", "B3": "1234569",
+        "I1": "2345678", "E4": "2", "I2": "2345678", "F3": "24", "F5": "37",
+        "E5": "678", "G4": "345678", "E2": "567", "D2": "9", "F9": "6", "C7":
+        "2345678", "C4": "345678", "B7": "2345678", "I6": "23678", "D3": "8",
+        "A8": "345689", "F1": "1", "F8": "58", "I3": "23456", "D1": "36",
+        "H6": "1236789", "I4": "345678", "H7": "2345678", "E6": "4", "B5":
+        "23456789", "D4": "1", "G6": "1236789", "G9": "24578", "G5":
+        "23456789", "A2": "234568", "B1": "2345689", "F2": "24", "G7":
+        "2345678", "D9": "47", "H9": "24578", "G2": "12345678", "A6": "23689",
+        "E7": "9", "H8": "345678", "A7": "234568", "G3": "1234569", "C1":
+        "2345689", "H4": "345678", "B9": "124578", "C5": "23456789", "D5":
+        "36", "I5": "2345678", "H2": "12345678", "E1": "567", "C6": "236789",
+        "H1": "23456789", "F6": "37", "I8": "345678", "G8": "345678", "G1":
+        "23456789", "A5": "1", "C9": "124578", "B4": "345678", "F7": "58",
+        "B8": "3456789", "C8": "3456789", "D7": "47"}
     print("input:")
-    display(grid_values(diag_sudoku_grid))
+    display(sudoku)
     print("\nsolution:")
-    display(solve(diag_sudoku_grid))
+    display(solve(sudoku))
 
     try:
         from visualize import visualize_assignments
