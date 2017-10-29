@@ -44,73 +44,34 @@ This process will create a zipfile in your top-level directory named sudoku-<id>
 
 ## Problemo 🔥🔥
 
-Unit Test and PA fails because my solution is incorrect. PA says
->Not all of the tests passed.  Let me see what I can do to help.
-
->Your submission failed a test that sees whether the solve method
-produces a valid solution.  One of the original values was changed.
-Try your code on the following example:
-
->9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9.....
-...........
-
-However running a solve on the above code shows that no original values of the input were modified in the solution.
+PA fails because my code produced an `unexpected board`. Running the code locally returns a valid board though
 
 ```
 ▶ python solution.py
 input:
-    9   .   1|.   .   . |.   8   .
-    8   .   5|.   7   . |.   4   .
-    2   .   4|.   .   . |.   6   .
-   ----------+----------+---------
-    .   .   7|.   .   . |.   .   .
-    .   .   .|.   .   . |8   3   .
-    5   .   .|.   .   . |.   .   .
-   ----------+----------+---------
-    3   .   .|6   .   . |.   .   .
-    .   9   .|.   .   . |.   .   .
-    .   .   .|.   .   . |.   .   .
+ 2345689   234568     7    |  34568      1      23689  |  234568   345689    2458
+ 2345689  1234568  1234569 |  345678  23456789  236789 | 2345678  3456789   124578
+ 2345689  1234568  1234569 |  345678  23456789  236789 | 2345678  3456789   124578
+---------------------------+---------------------------+---------------------------
+    36       9        8    |    1        36       5    |    47       2        47
+   567      567       56   |    2       678       4    |    9        1        3
+    1        24       24   |    9        37       37   |    58       58       6
+---------------------------+---------------------------+---------------------------
+ 23456789 12345678 1234569 |  345678  23456789 1236789 | 2345678   345678   24578
+ 23456789 12345678 1234569 |  345678  23456789 1236789 | 2345678   345678   24578
+ 2345678  2345678   23456  |  345678  2345678   23678  |    1      345678     9
 
 solution:
-9 6 1 |4 5 5 |7 8 3
-8 3 5 |9 7 6 |2 4 1
-2 7 4 |8 1 3 |5 6 9
+4 3 7 |5 1 9 |6 8 2
+9 6 1 |3 2 8 |7 4 5
+8 5 2 |6 4 7 |3 9 1
 ------+------+------
-6 4 7 |2 3 8 |9 1 5
-1 2 9 |5 6 4 |8 3 7
-5 8 3 |1 9 7 |4 2 6
+3 9 8 |1 6 5 |4 2 7
+6 7 5 |2 8 4 |9 1 3
+1 2 4 |9 7 3 |8 5 6
 ------+------+------
-3 5 2 |6 8 9 |1 7 4
-4 9 6 |7 2 1 |3 5 8
-7 1 8 |3 4 2 |6 9 5
-```
-
-The unit test results:
-
-```
-expected (as in test_solution.py):
-2 6 7 |9 4 5 |3 8 1
-8 5 3 |7 1 6 |2 4 9
-4 9 1 |8 2 3 |5 7 6
-------+------+------
-5 7 6 |4 3 8 |1 9 2
-3 8 4 |1 9 2 |6 5 7
-1 2 9 |6 5 7 |4 3 8
-------+------+------
-6 4 2 |3 7 9 |8 1 5
-9 3 5 |2 8 1 |7 6 4
-7 1 8 |5 6 4 |9 2 3
-
-solution:
-2 5 7 |8 4 1 |3 9 6
-8 9 3 |7 5 6 |2 4 1
-4 6 1 |9 2 3 |5 7 8
-------+------+------
-5 7 6 |4 3 8 |9 1 2
-1 8 9 |6 7 2 |4 3 5
-3 2 4 |1 9 5 |6 8 7
-------+------+------
-6 4 2 |3 1 7 |8 5 9
-7 3 5 |2 8 9 |1 6 4
-9 1 8 |5 6 4 |7 2 3
+2 4 6 |7 9 1 |5 3 8
+5 1 9 |8 3 6 |2 7 4
+7 8 3 |4 5 2 |1 6 9
+We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.
 ```
